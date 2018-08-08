@@ -1,7 +1,7 @@
 ember-cli-create
 ==============================================================================
 
-CLI wizard to create a new ember project
+CLI wizard to create a new ember project.
 
 ![Demo](demo.gif)
 
