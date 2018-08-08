@@ -1,29 +1,24 @@
 {
 	"name": "ember-cli-create",
 	"version": "0.0.0",
-	"description": "The default blueprint for ember-cli addons.",
+	"description": "CLI wizard to create a new ember project",
 	"keywords": [
 		"ember.js",
-		"ember-addon",
 		"ember-cli"
 	],
 	"bin": {
 		"ember-cli-create": "bin/ember-cli-create.js"
 	},
-	"repository": "",
+	"repository": "https://github.com/gossi/ember-cli-create",
+	"homepage": "https://github.com/gossi/ember-cli-create",
 	"license": "MIT",
-	"author": "",
-	"directories": {
-		"doc": "doc",
-		"test": "tests"
-	},
+	"author": "Thomas Gossmann",
 	"scripts": {
-		"build": "ember build",
-		"lint:js": "eslint .",
-		"start": "ember serve",
-		"test": "ember test"
 	},
 	"dependencies": {
+		"@ember/optional-features": "^0.6.3",
+		"ember-source-channel-url": "^1.1.0",
+		"execa": "^0.10.0",
 		"chalk": "^2.4.1",
 		"commander": "^2.17.0",
 		"inquirer": "^6.0.0",
@@ -33,13 +28,8 @@
 		"zen-observable": "^0.8.9"
 	},
 	"devDependencies": {
-		"@ember/optional-features": "^0.6.3",
-		"ember-cli": "~3.2.0",
-		"ember-cli-dependency-checker": "^2.0.0",
-		"ember-source-channel-url": "^1.1.0",
 		"eslint": "^5.0.1",
-		"eslint-plugin-node": "^6.0.1",
-		"execa": "^0.10.0"
+		"eslint-plugin-node": "^6.0.1"
 	},
 	"engines": {
 		"node": "6.* || 8.* || >= 10.*"

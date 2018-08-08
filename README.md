@@ -1,48 +1,40 @@
 ember-cli-create
 ==============================================================================
 
-[Short description of the addon.]
+CLI wizard to create a new ember project
+
+![Demo](demo.gif)
 
 Installation
 ------------------------------------------------------------------------------
 
 ```
-ember install ember-cli-create
+yarn global add ember-cli-create
 ```
-
 
 Usage
 ------------------------------------------------------------------------------
 
-[Longer description of how to use the addon in apps.]
+```
+  Usage: ember-cli-create [options] [type] [name]
+
+  Options:
+
+    -V, --version       output the version number
+    --directory <path>  Where to place the files
+    --npm               Use npm as package manager (instead of yarn)
+    --welcome           To install the {{ember-welcome-page}}
+    -h, --help          output usage information
+```
 
 
-Contributing
+Notes
 ------------------------------------------------------------------------------
 
-### Installation
+The addon list is based on a rough selection I did. Though I expect this high subject of change. Open an issue to discuss how this can be populated in a nice way.
 
-* `git clone <repository-url>`
-* `cd ember-cli-create`
-* `yarn install`
+Some of my ideas with this: Support presets and blueprints.
 
-### Linting
-
-* `yarn lint:js`
-* `yarn lint:js --fix`
-
-### Running tests
-
-* `ember test` – Runs the test suite on the current Ember version
-* `ember test --server` – Runs the test suite in "watch mode"
-* `ember try:each` – Runs the test suite against multiple Ember versions
-
-### Running the dummy application
-
-* `ember serve`
-* Visit the dummy application at [http://localhost:4200](http://localhost:4200).
-
-For more information on using ember-cli, visit [https://ember-cli.com/](https://ember-cli.com/).
 
 License
 ------------------------------------------------------------------------------
