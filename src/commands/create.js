@@ -8,58 +8,7 @@ const Listr = require('listr');
 const Observable = require('zen-observable');
 const features = require('@ember/optional-features/features');
 const getEmberSourceUrl = require('ember-source-channel-url');
-
-
-// const prompt = inquirer.createPromptModule();
-// process.env.FORCE_COLOR = true;
-const sep = new inquirer.Separator();
-
-
-const TYPES = ['app', 'addon'];
-
-const section = (title) => { return new inquirer.Separator(chalk.reset.green.underline(title)); };
-const STYLERS = ['ember-cli-sass', 'ember-cli-less'];
-const HELPERS = ['ember-composable-helpers', 'ember-truth-helpers', 'ember-math-helpers'];
-const LANGUAGE = ['ember-decorators', 'ember-cli-typescript', 'ember-component-css'];
-const UIFRAMEWORKS = ['ember-cli-tailwind', 'ember-bootstrap', 'ember-paper'];
-const TESTING = ['qunit-dom', 'ember-cli-mirage', 'ember-mocha'];
-const POPULAR = ['ember-concurrency', 'ember-simple-auth', 'ember-intl', 'ember-power-select'];
-const ADDONS = [].concat(
-	section('Language Features & Structure'), LANGUAGE,
-	section('CSS Preprocessors'), STYLERS,
-	section('Helpers'), HELPERS,
-	section('UI Frameworks'), UIFRAMEWORKS,
-	section('Testing'), TESTING,
-	section('Popular'), POPULAR
-);
-
-const EXPERIMENTS = [
-	{
-		name: 'Packager',
-		value: 'PACKAGER'
-	}, {
-		name: 'Module Unification (MU)',
-		value: 'MODULE_UNIFICATION'
-	}, {
-		name: 'Broccoli 2',
-		value: 'BROCCOLI_2'
-	}, {
-		name: 'System Temp Directory (will enable Broccoli 2)',
-		value: 'SYSTEM_TEMP'
-	}, {
-		name: 'Delayed Transpilation',
-		value: 'DELAYED_TRANSPILATION'
-	}
-];
-
-const enabledFeatures = ['template-only-glimmer-components'];
-const FEATURES = Object.keys(features).map(feature => {
-	return {
-		name: feature,
-		value: feature,
-		checked: enabledFeatures.includes(feature)
-	};
-});
+const compileQuestions = require('../prompts/create-wizard');
 
 module.exports = class CreateCommand {
 
@@ -74,77 +23,21 @@ module.exports = class CreateCommand {
 	}
 
 	async interact() {
-		const answers = await inquirer.prompt([
-			{
-				type: 'list',
-				name: 'type',
-				message: 'Which type of project are you generating?',
-				choices: ['app', 'addon', new inquirer.Separator('engine (One day... One day!)')],
-				when: () => {
-					return !TYPES.includes(this.args.type);
-				}
-			}, {
-				type: 'input',
-				name: 'name',
-				message: 'What is the name of your project',
-				suffix: ':',
-				when: () => {
-					return !this.args.name;
-				},
-				validate(input) {
-					if (input !== '') {
-						return true;
-					}
+		// let preset = this.loadPreset();
+		const answers = await new inquirer.prompt(compileQuestions(this.args, this.options));
 
-					return 'Please enter a name for your project';
-				}
-			}, {
-				type: 'input',
-				name: 'target',
-				message: 'Where to create your project?',
-				suffix: ':',
-				default(answers) {
-					return path.join(process.cwd(), answers.name);
-				},
-				validate(input) {
-					return input !== '';
-				},
-				when: () => {
-					return !this.options.directory || this.options.directory !== '';
-				}
-			}, {
-				type: 'checkbox',
-				name: 'addons',
-				message: 'Which addons do you want?',
-				pageSize: ADDONS.length,
-				choices: ADDONS
-			}, {
-				type: 'checkbox',
-				name: 'experiments',
-				message: 'Go crazy and enable some ember-cli experiments (This will install canary versions of ember and ember-cli)',
-				pageSize: EXPERIMENTS.length,
-				choices: EXPERIMENTS
-			}, {
-				type: 'checkbox',
-				name: 'features',
-				message: 'Enable/Disable features (@ember/optional-features)',
-				pageSize: FEATURES.length,
-				choices: FEATURES
-			}
-		]);
+		// preset = {
+		// 	packageManager: this.options.npm ? 'npm' : 'yarn',
+		// 	type: this.args.type || answers.type,
+		// 	name: this.args.name || answers.name,
+		// 	target: this.options.diretory ||  answers.target,
+		// 	addons: answers.addons,
+		// 	experiments: answers.experiments,
+		// 	features: answers.features,
+		// 	welcome: !!this.options.welcome
+		// }
 
-		const preset = {
-			packageManager: this.options.npm ? 'npm' : 'yarn',
-			type: this.args.type || answers.type,
-			name: this.args.name || answers.name,
-			target: this.options.diretory ||  answers.target,
-			addons: answers.addons,
-			experiments: answers.experiments,
-			features: answers.features,
-			welcome: !!this.options.welcome
-		}
-
-		return preset;
+		// return preset;
 	}
 
 	async execute(preset) {
@@ -307,6 +200,25 @@ module.exports = class CreateCommand {
 				});
 			}
 		}
+	}
+
+	loadPreset() {
+		if (this.options.preset) {
+			// try load preset by name
+			try {
+				let preset = require('../contents/' + this.options.preset);
+				if (typeof (preset) === 'function') {
+					return preset();
+				} else {
+					return preset;
+				}
+			} catch (e) { }
+
+			// try by filename
+
+		}
+
+		return preset;
 	}
 
 	/**
