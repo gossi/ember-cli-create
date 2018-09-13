@@ -7,10 +7,16 @@ const TYPES = ['app', 'addon'];
 
 const PRESETS = [
 	{
-		name: `Stable\n  ${chalk.dim('-> Solid ember installation you can bet on')}`,
-		value: 'stable'
+		name: `Stable App\n  ${chalk.dim('-> Solid ember installation you can bet on')}`,
+		value: 'app'
 	}, {
-		name: `Modern\n  ${chalk.dim('-> MU, TS, Decorators, Sparkles, ...')}`,
+		name: `Stable Addon\n  ${chalk.dim('-> Solid ember installation you can bet on')}`,
+		value: 'addon'
+	}, {
+		name: `Octane\n  ${chalk.dim('-> MU, Decorators, Sparkles, ...')}`,
+		value: 'modern'
+	}, {
+		name: `Octane + TS\n  ${chalk.dim('-> Octane with Type-Power ...')}`,
 		value: 'modern'
 	}, {
 		name: `Manual... \n  ${chalk.dim('-> Run this wizard on your own, select your needs')}`,
@@ -23,7 +29,8 @@ module.exports = function (args, options) {
 		{
 			type: 'list',
 			name: 'preset',
-			message: 'Choose a preset (or proceed manually)',
+			message: 'What kind of ember project you want to create?',
+			pageSize: PRESETS.length * 2,
 			choices: PRESETS,
 			when: () => {
 				return !options.preset;
@@ -34,8 +41,8 @@ module.exports = function (args, options) {
 			name: 'type',
 			message: 'Which type of project are you generating?',
 			choices: ['app', 'addon', new inquirer.Separator('engine (One day... One day!)')],
-			when: () => {
-				return !TYPES.includes(args.type);
+			when: (answers) => {
+				return !TYPES.includes(args.type) && answers.preset === 'manual';
 			}
 		}, {
 			type: 'input',
@@ -43,7 +50,7 @@ module.exports = function (args, options) {
 			message: 'What is the name of your project',
 			suffix: ':',
 			when: () => {
-				return !args.name;
+				return !args.name && answers.preset === 'manual';
 			},
 			validate(input) {
 				if (input !== '') {
@@ -71,19 +78,28 @@ module.exports = function (args, options) {
 			name: 'addons',
 			message: 'Which addons do you want?',
 			pageSize: ADDONS.length,
-			choices: ADDONS
+			choices: ADDONS,
+			when: (answers) => {
+				return answers.preset === 'manual';
+			}
 		}, {
 			type: 'checkbox',
 			name: 'experiments',
 			message: 'Experiments for ember-cli (This will install canary versions of ember and ember-cli)',
 			pageSize: EXPERIMENTS.length,
-			choices: EXPERIMENTS
+			choices: EXPERIMENTS,
+			when: (answers) => {
+				return answers.preset === 'manual';
+			}
 		}, {
 			type: 'checkbox',
 			name: 'features',
 			message: 'Enable/Disable features (@ember/optional-features)',
 			pageSize: FEATURES.length,
-			choices: FEATURES
+			choices: FEATURES,
+			when: (answers) => {
+				return answers.preset === 'manual';
+			}
 		}
 	];
 }
