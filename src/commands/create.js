@@ -43,6 +43,10 @@ module.exports = class CreateCommand {
 			{
 				title: 'Configure Project',
 				task: require('../tasks/config')
+			},
+			{
+				title: 'Install Project',
+				task: require('../tasks/install')
 			}
 			// {
 			// 	title: 'Install Ember',
