@@ -6,7 +6,7 @@ const execa = require('execa');
 const split = require('split');
 const Listr = require('listr');
 const Observable = require('zen-observable');
-const features = require('@ember/optional-features/features');
+const FEATURES = require('@ember/optional-features/features');
 const getEmberSourceUrl = require('ember-source-channel-url');
 const compileQuestions = require('../prompts/create-wizard');
 
@@ -18,55 +18,56 @@ module.exports = class CreateCommand {
 	}
 
 	async run() {
-		const preset = await this.interact();
-		await this.execute(preset);
+		const config = await this.interact();
+		await this.execute(config);
 	}
 
 	async interact() {
-		// let preset = this.loadPreset();
+
 		const answers = await new inquirer.prompt(compileQuestions(this.args, this.options));
+		if (!answers.preset && this.options.preset) {
+			answers.preset = this.options.preset;
+		}
 
-		// preset = {
-		// 	packageManager: this.options.npm ? 'npm' : 'yarn',
-		// 	type: this.args.type || answers.type,
-		// 	name: this.args.name || answers.name,
-		// 	target: this.options.diretory ||  answers.target,
-		// 	addons: answers.addons,
-		// 	experiments: answers.experiments,
-		// 	features: answers.features,
-		// 	welcome: !!this.options.welcome
-		// }
-
-		// return preset;
+		const config = this.compileConfig(answers);
+		console.log(config);
+		return config;
 	}
 
-	async execute(preset) {
-		const config = this.getConfig(preset);
+	async execute(config) {
 		const tasks = new Listr([
 			{
-				title: 'Install Ember',
-				task: () => {
-					return new Listr([
-						{
-							title: 'Run ember install',
-							task: () => this.installProject(config)
-						},
-						{
-							title: 'Post ember install',
-							task: () => this.processPostInstallProject(config)
-						}
-					]);
-				}
-			}, {
-				title: 'Install Addons',
-				task: () => this.installAddons(config)
-			}, {
-				title: 'Run Generators',
-				task: () => this.runGenerators(config)
+				title: 'Init Project',
+				task: require('../tasks/init')
+			},
+			{
+				title: 'Configure Project',
+				task: require('../tasks/config')
 			}
+			// {
+			// 	title: 'Install Ember',
+			// 	task: () => {
+			// 		return new Listr([
+			// 			{
+			// 				title: 'Run ember install',
+			// 				task: () => this.installProject(config)
+			// 			},
+			// 			{
+			// 				title: 'Post ember install',
+			// 				task: () => this.processPostInstallProject(config)
+			// 			}
+			// 		]);
+			// 	}
+			// }, {
+			// 	title: 'Install Addons',
+			// 	task: () => this.installAddons(config)
+			// }, {
+			// 	title: 'Run Generators',
+			// 	task: () => this.runGenerators(config)
+			// }
 		]);
 
-		tasks.run().catch(err => {
+		tasks.run({config}).catch(err => {
 			console.error(err);
 		});
 	}
@@ -202,23 +203,17 @@ module.exports = class CreateCommand {
 		}
 	}
 
-	loadPreset() {
-		if (this.options.preset) {
-			// try load preset by name
-			try {
-				let preset = require('../contents/' + this.options.preset);
-				if (typeof (preset) === 'function') {
-					return preset();
-				} else {
-					return preset;
-				}
-			} catch (e) { }
+	loadPreset(preset) {
+		try {
+			if (preset) {
+				let config = require(`../presets/${preset}`);
+				return config;
+			}
+		} catch (e) {
 
-			// try by filename
-
+		} finally {
+			return require(`../presets/manual`);
 		}
-
-		return preset;
 	}
 
 	/**
@@ -231,8 +226,39 @@ module.exports = class CreateCommand {
 
 		// features
 		const feats = {};
-		for (let feat of Object.keys(features)) {
+		for (let feat of Object.keys(FEATURES)) {
 			feats[feat] = preset.features.includes(feat);
+		}
+		config.features = feats;
+
+		// experiments
+
+		// enable broccoli2 when system_temp is enabled
+		if (config.experiments.includes('SYSTEM_TEMP') && !config.experiments.includes('BROCCOLI_2')) {
+			config.experiments.push('BROCCOLI_2');
+		}
+
+		return config;
+	}
+
+	compileConfig(answers) {
+		const config = {
+			packageManager: this.options.npm ? 'npm' : 'yarn',
+			type: 'app',
+			addons: [],
+			features: [],
+			experiments: [],
+			welcome: !!this.options.welcome
+		};
+		const preset = this.loadPreset(answers.preset);
+		Object.assign(config, preset, answers);
+
+		config.cmd = config.type === 'addon' ? 'addon' : 'new';
+
+		// features
+		const feats = {};
+		for (let feat of Object.keys(FEATURES)) {
+			feats[feat] = config.features.includes(feat);
 		}
 		config.features = feats;
 
