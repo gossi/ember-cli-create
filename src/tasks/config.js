@@ -59,6 +59,15 @@ async function configureAddons(config, observer) {
 			const version = await latestVersion(addon);
 			pkg.devDependencies[addon] = `^${version}`;
 		}
+
+		// sort packages
+		const deps = {};
+		for (let key of Object.keys(pkg.devDependencies).sort()) {
+			deps[key] = pkg.devDependencies[key];
+		}
+
+		pkg.devDependencies = deps;
+
 		writePackage(config, pkg);
 	}
 }
