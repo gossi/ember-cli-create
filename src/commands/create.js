@@ -30,7 +30,7 @@ module.exports = class CreateCommand {
 		}
 
 		const config = this.compileConfig(answers);
-		// console.log(config);
+		console.log(config);
 		return config;
 	}
 
@@ -238,7 +238,11 @@ module.exports = class CreateCommand {
 			welcome: !!this.options.welcome
 		};
 		const preset = this.loadPreset(answers.preset);
+		console.log(preset);
 		Object.assign(config, preset, answers);
+		config.addons = config.addons.concat(preset.addons|| []);
+		// config.features.push(...preset.features);
+		// config.experiments.push(...preset.experiments);
 
 		config.cmd = config.type === 'addon' ? 'addon' : 'new';
 

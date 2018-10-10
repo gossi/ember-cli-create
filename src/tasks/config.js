@@ -5,16 +5,16 @@ const Observable = require('zen-observable');
 const latestVersion = require('latest-version');
 
 function readPackage(config) {
-	return require(path.join(config.directory, '/package.json'));
+	return require(path.join(config.directory, 'package.json'));
 }
 
 function writePackage(config, contents) {
-	fs.writeFileSync(path.join(config.directory, '/package.json'), JSON.stringify(contents, null, '  '), 'utf-8');
+	fs.writeFileSync(path.join(config.directory, 'package.json'), JSON.stringify(contents, null, '  '), 'utf-8');
 }
 
 async function configureExperiments(config, observer) {
 	// 1) install canary versions
-	if (config.experiments.length) {
+	if (config.experiments.length > 0) {
 		observer.next('Require canary version because of experiments');
 		const pkg = readPackage(config);
 		pkg.devDependencies['ember-source'] = await getEmberSourceUrl('canary');
@@ -40,7 +40,7 @@ async function configureExperiments(config, observer) {
 async function configureFeatures(config, observer) {
 	// 1) write config/optional-features.json
 	observer.next('Write config/optional-features.json')
-	fs.writeFileSync(path.join(config.directory, '/config/optional-features.json'), JSON.stringify(config.features, null, '  '), 'utf-8');
+	fs.writeFileSync(path.join(config.directory, 'config/optional-features.json'), JSON.stringify(config.features, null, '  '), 'utf-8');
 
 	// 2) remove @ember/jquery (if opted out)
 	const pkg = readPackage(config);
