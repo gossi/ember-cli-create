@@ -3,6 +3,7 @@ const path = require('path');
 const getEmberSourceUrl = require('ember-source-channel-url');
 const Observable = require('zen-observable');
 const latestVersion = require('latest-version');
+const sortMap = require('../utils/sort-map');
 
 function readPackage(config) {
 	return require(path.join(config.directory, 'package.json'));
@@ -13,28 +14,46 @@ function writePackage(config, contents) {
 }
 
 async function configureExperiments(config, observer) {
-	// 1) install canary versions
 	if (config.experiments.length > 0) {
+		// 1) install canary versions
 		observer.next('Require canary version because of experiments');
 		const pkg = readPackage(config);
 		pkg.devDependencies['ember-source'] = await getEmberSourceUrl('canary');
 		pkg.devDependencies['ember-cli'] = 'github:ember-cli/ember-cli';
 
+		// // 2) dump experiments into .ember-cli
+		// observer.next('dump experiments into .ember-cli');
+		// const json = {
+		// 	disableAnalytics: false,
+		// 	environment: {}
+		// };
+
+		// for (let experiment of config.experiments) {
+		// 	json.environment[`EMBER_CLI_${experiment}`] = true;
+		// }
+
+		// fs.writeFileSync('.ember-cli', JSON.stringify(json, null, '  '), 'utf-8');
+
+		// 2) adjust package.json to include environment variables
+		observer.next('Adjust package.json to include environment variables');
+
+		const scripts = pkg.scripts;
+		const vars = [];
+
+		for (let experiment of config.experiments) {
+			vars.push(`EMBER_CLI_${experiment}=true`);
+		}
+
+		scripts['ember'] = `${vars.join(' ')} ember`;
+		scripts['build'] = scripts['build'].replace('ember', 'yarn ember');
+		scripts['start'] = scripts['start'].replace('ember', 'yarn ember');
+		scripts['test'] = scripts['test'].replace('ember', 'yarn ember');
+		scripts['test-server'] = `yarn ember serve -e test`;
+
+		pkg.scripts = sortMap(scripts);
+
 		writePackage(config, pkg);
 	}
-
-	// 2) dump experiments into .ember-cli
-	observer.next('dump experiments into .ember-cli');
-	const json = {
-		disableAnalytics: false,
-		environment: {}
-	};
-
-	for (let experiment of config.experiments) {
-		json.environment[`EMBER_CLI_${experiment}`] = true;
-	}
-
-	fs.writeFileSync('.ember-cli', JSON.stringify(json, null, '  '), 'utf-8');
 }
 
 async function configureFeatures(config, observer) {
@@ -61,12 +80,7 @@ async function configureAddons(config, observer) {
 		}
 
 		// sort packages
-		const deps = {};
-		for (let key of Object.keys(pkg.devDependencies).sort()) {
-			deps[key] = pkg.devDependencies[key];
-		}
-
-		pkg.devDependencies = deps;
+		pkg.devDependencies = sortMap(pkg.devDependencies);
 
 		writePackage(config, pkg);
 	}
@@ -79,7 +93,8 @@ module.exports = (context) => {
 
 		// test if project folder exists
 		if (!fs.existsSync(config.directory)) {
-			observer.error(new Error('Project creation failed, directory does not exists'));
+			observer.error(new Error('Project creation failed during initiation.'));
+			return;
 		}
 
 		process.chdir(config.directory);

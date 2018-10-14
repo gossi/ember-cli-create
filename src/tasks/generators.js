@@ -2,17 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const Observable = require('zen-observable');
 const exec = require('../utils/exec');
+const execa = require('execa');
+const workspace = require('../utils/workspace');
+
+const ADDON_WHITELIST = ['ember-cli-typescript'];
 
 module.exports = (context) => {
 	const { config } = context;
 
 	return new Observable(async observer => {
+		const generators = [];
 		if (config.addons.length) {
-			const generators = [];
+
+			const dirs = [config.directory];
+			const workspaceDir = workspace.getWorkspaceDir(config.directory);
+			if (workspaceDir) {
+				dirs.push(workspaceDir);
+			}
+
 			// let's collect generators first
 			for (const addon of config.addons) {
-				if (fs.existsSync(path.join(config.directory, 'node_modules', addon, 'blueprints', addon))) {
-					generators.push(addon);
+				for (const dir of dirs) {
+					if (ADDON_WHITELIST.includes(addon) || fs.existsSync(path.join(dir, 'node_modules', addon, 'blueprints', addon))) {
+						generators.push(addon);
+					}
 				}
 			}
 
@@ -26,7 +39,7 @@ module.exports = (context) => {
 				for (const generator of generators) {
 					observer.next(`generate ${generator}`);
 					try {
-						await exec('ember', ['g', generator], options);
+						await execa('ember', ['generate', generator], options);
 					} catch (error) {
 						observer.error(error);
 					}
