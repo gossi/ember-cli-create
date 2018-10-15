@@ -13,7 +13,7 @@ module.exports = async (context) => {
 	args.push(config.welcome ? '--welcome' : '--no-welcome');
 
 	if (config['web-component']) {
-		args.push('--web-component', config['web-component']);
+		args.push(`--web-component=${config['web-component']}`);
 	}
 
 	if (config.blueprint) {
