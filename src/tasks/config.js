@@ -21,38 +21,24 @@ async function configureExperiments(config, observer) {
 		pkg.devDependencies['ember-source'] = await getEmberSourceUrl('canary');
 		pkg.devDependencies['ember-cli'] = 'github:ember-cli/ember-cli';
 
-		// // 2) dump experiments into .ember-cli
-		// observer.next('dump experiments into .ember-cli');
-		// const json = {
-		// 	disableAnalytics: false,
-		// 	environment: {}
-		// };
+		writePackage(config, pkg);
 
-		// for (let experiment of config.experiments) {
-		// 	json.environment[`EMBER_CLI_${experiment}`] = true;
-		// }
+		// 2) adjust .ember-cli.js to include environment variables
+		observer.next('Update .ember-cli.js to include environment variables');
 
-		// fs.writeFileSync('.ember-cli', JSON.stringify(json, null, '  '), 'utf-8');
-
-		// 2) adjust package.json to include environment variables
-		observer.next('Adjust package.json to include environment variables');
-
-		const scripts = pkg.scripts;
-		const vars = [];
+		let script = `'use strict';\n\n`;
 
 		for (let experiment of config.experiments) {
-			vars.push(`EMBER_CLI_${experiment}=true`);
+			script += `process.env.EMBER_CLI_${experiment} = true;\n`;
 		}
 
-		scripts['ember'] = `${vars.join(' ')} ember`;
-		scripts['build'] = scripts['build'].replace('ember', 'yarn ember');
-		scripts['start'] = scripts['start'].replace('ember', 'yarn ember');
-		scripts['test'] = scripts['test'].replace('ember', 'yarn ember');
-		scripts['test-server'] = `yarn ember serve -e test`;
-
-		pkg.scripts = sortMap(scripts);
-
-		writePackage(config, pkg);
+		const emberCliPath = path.join(config.directory, '.ember-cli');
+		if (fs.existsSync(emberCliPath)) {
+			const content = fs.readFileSync(emberCliPath);
+			script += `\nmodule.exports = ${content}`;
+			fs.writeFileSync(emberCliPath + '.js', script);
+			fs.unlinkSync(emberCliPath);
+		}
 	}
 }
 

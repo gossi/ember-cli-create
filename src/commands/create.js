@@ -50,7 +50,6 @@ module.exports = class CreateCommand {
 
 		try {
 			await tasks.run({ config });
-			const ex = config.experiments.length > 0;
 
 			ui.div({
 				text:
@@ -73,11 +72,11 @@ module.exports = class CreateCommand {
 
 			ui.div({
 				text:
-					`Serve:       \t${chalk.yellow(ex ? 'yarn start' : 'ember serve')}\n` +
-					`Build:       \t${chalk.yellow(ex ? 'yarn build' : 'ember build')}\n` +
-					`Generate:    \t${chalk.yellow(ex ? 'yarn generate' : 'ember generate') + chalk.yellow.dim(' <blueprint> <name>')}\n` +
-					`Test:        \t${chalk.yellow(ex ? 'yarn test' : 'ember test')}\n` +
-					`Test Server: \t${chalk.yellow(ex ? 'yarn test-server' : 'ember serve -e test')}`,
+					`Serve:       \t${chalk.yellow('ember serve')}\n` +
+					`Build:       \t${chalk.yellow('ember build')}\n` +
+					`Generate:    \t${chalk.yellow('ember generate') + chalk.yellow.dim(' <blueprint> <name>')}\n` +
+					`Test:        \t${chalk.yellow('ember test')}\n` +
+					`Test Server: \t${chalk.yellow('ember serve -e test')}`,
 				padding: [0, 0, 1, 1]
 			});
 
