@@ -394,7 +394,7 @@ elegant-spinner@^1.0.1:
   resolved "https://registry.yarnpkg.com/elegant-spinner/-/elegant-spinner-1.0.1.tgz#db043521c95d7e303fd8f345bedc3349cfb0729e"
   integrity sha1-2wQ1IcldfjA/2PNFvtwzSc+wcp4=
 
-ember-cli-version-checker@^2.1.0:
+ember-cli-version-checker@^2.1.0, ember-cli-version-checker@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/ember-cli-version-checker/-/ember-cli-version-checker-2.1.2.tgz#305ce102390c66e4e0f1432dea9dc5c7c19fed98"
   integrity sha512-sjkHGr4IGXnO3EUcY21380Xo9Qf6bC8HWH4D62bVnrQop/8uha5XgMQRoAflMCeH6suMrezQL287JUoYc2smEw==
