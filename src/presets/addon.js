@@ -1,6 +1,6 @@
 module.exports = {
 	type: 'addon',
-	addons: [],
+	addons: {},
 	experiments: [],
 	features: []
 };

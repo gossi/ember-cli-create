@@ -1,5 +1,7 @@
-const modern = require('./octane');
+const octane = require('./octane');
 
-modern.addons.push('ember-cli-typescript');
+octane.addons['ember-cli-typescript'] = {
+	version: 'next'
+};
 
-module.exports = modern;
+module.exports = octane;

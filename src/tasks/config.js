@@ -58,11 +58,20 @@ async function configureFeatures(config, observer) {
 }
 
 async function configureAddons(config, observer) {
-	if (config.addons.length) {
+	if (Object.keys(config.addons).length) {
 		const pkg = readPackage(config);
-		for (let addon of config.addons) {
-			const version = await latestVersion(addon);
-			pkg.devDependencies[addon] = `^${version}`;
+		try {
+			for (let [addon, options] of Object.entries(config.addons)) {
+				let version;
+				if (options.version) {
+					version = options.version;
+				} else {
+					version = '^' + await latestVersion(addon);
+				}
+				pkg.devDependencies[addon] = version;
+			}
+		} catch (e) {
+			observer.error(e);
 		}
 
 		// sort packages

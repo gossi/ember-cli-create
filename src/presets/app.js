@@ -1,6 +1,6 @@
 module.exports = {
 	type: 'app',
-	addons: [],
+	addons: {},
 	experiments: [],
 	features: [],
 	welcome: false

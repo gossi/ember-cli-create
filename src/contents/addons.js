@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const chalk = require('chalk');
 
-const STRUCTURE = ['ember-decorators', 'ember-cli-typescript', 'sparkles-component', 'sparkles-decorators', 'ember-css-modules', 'ember-auto-import'];
+const STRUCTURE = ['ember-decorators', 'ember-cli-typescript', 'sparkles-component', 'sparkles-decorators', 'ember-css-modules', 'ember-auto-import', 'ember-bind-helper'];
 const STYLERS = ['ember-cli-sass', 'ember-cli-less'];
 const HELPERS = ['ember-composable-helpers', 'ember-truth-helpers', 'ember-math-helpers'];
 const UIFRAMEWORKS = ['ember-cli-tailwind', 'ember-bootstrap', 'ember-paper'];
