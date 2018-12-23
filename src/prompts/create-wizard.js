@@ -17,6 +17,7 @@ function dasherize(str) {
 module.exports = function (args, options) {
 	// put options into local variables (so they are overridable with answers)
 	let preset = options.preset;
+	let name = args.name;
 
 	return [
 		{
@@ -48,11 +49,12 @@ module.exports = function (args, options) {
 			message: 'What is the name of your project',
 			suffix: ':',
 			when: () => {
-				return !args.name;
+				return !name;
 			},
 			validate(input) {
 				if (input !== '') {
-					return true;
+					name = input;
+					return name;
 				}
 
 				return 'Please enter a name for your project';
@@ -62,8 +64,8 @@ module.exports = function (args, options) {
 			name: 'directory',
 			message: 'Where to create your project?',
 			suffix: ':',
-			default(answers) {
-				return './' + answers.name;
+			default() {
+				return './' + name;
 			},
 			validate(input) {
 				return input !== '';

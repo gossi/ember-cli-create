@@ -13,9 +13,7 @@ programm
 	.option('--npm', 'Use npm as package manager (instead of yarn)')
 	.option('--welcome', 'To install the {{ember-welcome-page}}')
 	.action(function (name, options) {
-		const cmd = new CreateCommand({
-			name: name
-		}, options);
+		const cmd = new CreateCommand({ name }, options);
 		cmd.run();
 	});
 

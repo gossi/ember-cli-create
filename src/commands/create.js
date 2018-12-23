@@ -25,6 +25,10 @@ module.exports = class CreateCommand {
 			answers.preset = this.options.preset;
 		}
 
+		if (!answers.name && this.args.name) {
+			answers.name = this.args.name;
+		}
+
 		return this.compileConfig(answers);
 	}
 
