@@ -54,7 +54,7 @@ module.exports = function (args, options) {
 			validate(input) {
 				if (input !== '') {
 					name = input;
-					return name;
+					return true;
 				}
 
 				return 'Please enter a name for your project';
@@ -84,8 +84,8 @@ module.exports = function (args, options) {
 			name: 'web-component',
 			message: 'What is your web component tag name?',
 			suffix: ':',
-			default(answers) {
-				return dasherize(answers.name);
+			default() {
+				return dasherize(name);
 			},
 			validate(input) {
 				if (input !== '') {
