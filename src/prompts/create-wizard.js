@@ -106,6 +106,13 @@ module.exports = function (args, options) {
 			message: 'Which addons do you want?',
 			choices: ADDONS,
 			pageSize: ADDONS.length,
+			filter(input) {
+				let map = {};
+				for (const key of input) {
+					map[key] = {};
+				}
+				return map;
+			},
 			when: () => {
 				return preset === 'manual';
 			}
