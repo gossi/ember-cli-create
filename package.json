@@ -1,6 +1,6 @@
 {
 	"name": "ember-cli-create",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"description": "CLI wizard to create a new ember project",
 	"keywords": [
 		"ember.js",
